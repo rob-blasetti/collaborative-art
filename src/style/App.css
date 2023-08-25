@@ -1,0 +1,170 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.navbar {
+  background-color: #fff;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+}
+
+.navbar__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.navbar__brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.navbar__menu {
+  display: flex;
+  align-items: center;
+}
+
+.navbar__account {
+  margin-right: 1rem;
+}
+
+.navbar__account span {
+  font-size: 0.9rem;
+}
+
+.navbar__logout,
+.navbar__menu a {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.navbar__logout:hover,
+.navbar__menu a:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .navbar__menu {
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: 1rem;
+  }
+
+  .navbar__logout,
+  .navbar__menu a {
+    margin: 0.3rem 0;
+  }
+}
+
+/* CollaborativeArt.css */
+.grid-image {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0 auto;
+}
+
+.grid-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.grid-image-container {
+  margin-top: 100px; /* position the image on screen */
+  margin-left: 400px; /* position the image on screen */
+  position: relative;
+  width: 500px; /* explicity set image dimensions */
+  height: 500px; /* explicity set image dimensions */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden; /* Ensure the frame content stays within the frame */
+  border: 10px solid #d6b20a; /* Golden border color */
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3); /* Shadow for a 3D effect */
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  max-height: calc(100% / var(--rows));
+}
+
+/* Tile styling, adjust as needed */
+.tile {
+  flex: 1;
+  aspect-ratio: 1 / 1;
+  background-color: transparent;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease-in-out;
+  max-width: calc(100% / var(--cols)) + 'px';
+  max-height: calc(100% / var(--rows)) + 'px';
+}
+
+.tile.clicked {
+  background-color: transparent;
+} 

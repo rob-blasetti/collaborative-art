@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useHistory
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import './Login.css'; // Import your custom stylesheet for Login component
+import '../style/Login.css'; // Import your custom stylesheet for Login component
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState(''); // State for error message
   const auth = getAuth();
+  let navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // Handle successful login
+      navigate('/');
     } catch (error) {
-      // Handle login error
-      console.error(error.message);
+      setErrorMessage('Username or password is incorrect');
     }
   };
 
@@ -36,6 +38,7 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         <button className="login-button" onClick={handleLogin}>Login</button>
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
       </div>
     </div>
   );

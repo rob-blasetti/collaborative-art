@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import firebase from './firebase';
-import SignUp from './SignUp';
-import Login from './Login';
-import AccountManagement from './AccountManagement';
-import CollaborativeArt from './CollaborativeArt';
-import DetailPanel from './DetailPanel';
-import './App.css';
+import firebase from './firebase'; 
+import SignUp from './components/SignUp';
+import Login from './components/Login';
+import AccountManagement from './components/AccountManagement';
+import CollaborativeArt from './components/CollaborativeArt';
+import DetailPanel from './components/DetailPanel';
+import './style/App.css';
 
 const Navbar = ({ user, onLogout }) => {
   const handleLogout = async () => {
