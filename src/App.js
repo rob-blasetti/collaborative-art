@@ -7,6 +7,13 @@ import AccountManagement from './components/AccountManagement';
 import CollaborativeArt from './components/CollaborativeArt';
 import DetailPanel from './components/DetailPanel';
 import './style/App.css';
+import { 
+  getBahaiMonth,
+  getBahaiCommunity,
+  getDonationsAmount,
+  getRemainingTiles,
+  getActiveMembers
+} from './helpers.js';
 
 const Navbar = ({ user, onLogout }) => {
   const handleLogout = async () => {
@@ -69,11 +76,11 @@ function App() {
             element={
               <>
                 <DetailPanel
-                  month={'Names'}
-                  communityName={'Banyule'}
-                  donations={'$150'}
-                  remainingTiles={17}
-                  activeMembers={4}
+                  month={getBahaiMonth()}
+                  communityName={getBahaiCommunity()}
+                  donations={getDonationsAmount()}
+                  remainingTiles={getRemainingTiles()}
+                  activeMembers={getActiveMembers()}
                 />
                 <CollaborativeArt />
               </>
