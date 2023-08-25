@@ -75,20 +75,29 @@ const [grid, setGrid] = useState(initialGrid);
   }, []);
 
   const handleTileClick = (row, col) => {
-    const newGrid = [...grid];
-    const today = new Date().toDateString();
-    
-    if (prevClickDate !== today) {
-      newGrid[row][col].color = 'transparent';
-      newGrid[row][col].clicked = true;
-      setGrid(newGrid);
+
+    const user = firebase.auth().currentUser;
+
+    if (user) {
+      const newGrid = [...grid];
+      const today = new Date().toDateString();
       
-      const drawingRef = firebase.database().ref('drawing');
-      drawingRef.child(`${row}-${col}`).set({ color: 'transparent' });
-      
-      socket.emit('updateTileColor', { row, col, color: 'transparent' });
+      if (prevClickDate !== today) {
+        setPrevClickDate(today);
+
+        newGrid[row][col].color = 'transparent';
+        newGrid[row][col].clicked = true;
+        setGrid(newGrid);
+        
+        const drawingRef = firebase.database().ref('drawing');
+        drawingRef.child(`${row}-${col}`).set({ color: 'transparent' });
+        
+        socket.emit('updateTileColor', { row, col, color: 'transparent' });
+      } else {
+        console.log('No clicks left today.')
+      }
     } else {
-      console.log('No clicks left today.')
+      console.log('User not authenticated. Please log in to click tiles.');
     }
   };
 
@@ -106,40 +115,6 @@ const [grid, setGrid] = useState(initialGrid);
     });
 
     socket.emit('wipeTiles', newGrid);
-  };
-
-  const renderGrid = () => {
-    return grid.map((row, rowIndex) => (
-      <div key={rowIndex} className="row">
-        {row.map((tile, colIndex) => (
-          <Tile
-            key={colIndex}
-            color={tile.color}
-            clicked={tile.clicked} // Pass the clicked state from your grid data
-            onClick={() => handleTileClick(rowIndex, colIndex)}
-          />
-        ))}
-      </div>
-    ));
-  };
-    
-  const updateInitialGridWithImage = async (imageColours) => {
-    console.log('Function call.');
-
-    const drawingRef = firebase.database().ref('drawing');
-  
-    try {
-      for (let row = 0; row < imageColours.length; row++) {
-        for (let col = 0; col < imageColours[row].length; col++) {
-          const color = imageColours[row][col];
-          await drawingRef.child(`${row}-${col}`).set({ color });
-        }
-      }
-  
-      console.log('Initial grid updated with image.');
-    } catch (error) {
-      console.error('Error updating initial grid with image:', error);
-    }
   };
 
   return (
