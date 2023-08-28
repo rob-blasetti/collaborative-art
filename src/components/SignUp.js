@@ -1,22 +1,36 @@
 import React, { useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getFunctions, httpsCallable } from 'firebase/functions'; // Import getFunctions and httpsCallable from the correct module
+
 import '../style/SignUp.css'; // Import your custom stylesheet for SignUp component
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState(''); // State for first name
-  const [bahaiId, setBahaiId] = useState(''); // State for Bahai ID
+  const [firstName, setFirstName] = useState('');
+  const [bahaiId, setBahaiId] = useState('');
   const auth = getAuth();
-
+  
   const handleSignUp = async () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      // Signed in user
       const user = userCredential.user;
       console.log('User signed up:', user);
 
-      // Redirect or perform further actions after successful sign-up
+      // user.updateProfile({
+      //   displayName: firstName,
+      // });
+
+      const functions = getFunctions();
+      const setCustomClaimsFunction = httpsCallable(functions, 'setCustomUserClaims');
+      await setCustomClaimsFunction({
+        uid: user.uid,
+        firstName: firstName,
+        bahaiID: bahaiId,
+      });
+
+      console.log('Custom claims set successfully.');
+
     } catch (error) {
       console.error(error);
       // Handle error
