@@ -16,24 +16,7 @@ import {
   getActiveMembers
 } from './helpers.js';
 
-import { 
-  getAuth,
-  getIdTokenResult 
-} from 'firebase/auth';
-
-const auth = getAuth();
-const user = auth.currentUser;
-
-if (user) {
-  getIdTokenResult(user).then((idTokenResult) => {
-    const customClaims = idTokenResult.claims;
-    console.log('Custom Claims:', customClaims);
-  }).catch((error) => {
-    console.error(error);
-  });
-}
-
-const Navbar = ({ user, onLogout }) => {
+const Navbar = ({ user, userMetadata, onLogout }) => {
   const handleLogout = async () => {
     try {
       await firebase.auth().signOut();
@@ -54,6 +37,12 @@ const Navbar = ({ user, onLogout }) => {
               <div className="navbar__account">
                 <span>{user.email}</span>
               </div>
+              <div className="navbar__account">
+                <span>{userMetadata.firstName}</span>
+              </div>
+              <div className="navbar__account">
+                <span>{userMetadata.bahaiID}</span>
+              </div>
               <button className="navbar__logout" onClick={handleLogout}>
                 Logout
               </button>
@@ -73,20 +62,28 @@ const Navbar = ({ user, onLogout }) => {
 function App() {
   const [user, setUser] = useState(null);
   const isAdmin = user && user.email === 'rblasett@gmail.com';
+  const [userMetadata, setUserMetadata] = useState({});
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged((currentUser) => {
       setUser(currentUser);
+      
+      if (currentUser && currentUser.displayName) {
+        const parsedData = JSON.parse(currentUser.displayName);
+        console.log(parsedData)
+        setUserMetadata(parsedData);
+      } else {
+        console.log("No user is signed in.");
+      }
     });
 
     return () => unsubscribe(); // Cleanup the listener on unmount
   }, []);
 
-
   return (
     <div className="App">
       <Router>
-        <Navbar user={user} />
+        <Navbar user={user} userMetadata={userMetadata} />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />

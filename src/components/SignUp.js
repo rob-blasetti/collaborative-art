@@ -1,39 +1,37 @@
 import React, { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFunctions, httpsCallable } from 'firebase/functions'; // Import getFunctions and httpsCallable from the correct module
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
-import '../style/SignUp.css'; // Import your custom stylesheet for SignUp component
+import '../style/SignUp.css';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [bahaiId, setBahaiId] = useState('');
-  const auth = getAuth();
-  
+  const [isActive, setIsActive] = useState(false);
+
   const handleSignUp = async () => {
+    const auth = getAuth();
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      console.log('User signed up:', user);
 
-      // user.updateProfile({
-      //   displayName: firstName,
-      // });
-
-      const functions = getFunctions();
-      const setCustomClaimsFunction = httpsCallable(functions, 'setCustomUserClaims');
-      await setCustomClaimsFunction({
-        uid: user.uid,
-        firstName: firstName,
+      // Store additional user data in metadata
+      const userData = {
+        firstName,
+        lastName,
         bahaiID: bahaiId,
+        isActive: isActive
+      };
+
+      await updateProfile(user, {
+        displayName: JSON.stringify(userData),
       });
 
-      console.log('Custom claims set successfully.');
-
+      console.log('User signed up successfully!', user);
     } catch (error) {
-      console.error(error);
-      // Handle error
+      console.error('Error signing up:', error);
     }
   };
 
@@ -41,12 +39,19 @@ const SignUp = () => {
     <div className="signup-container">
       <h2 className="signup-title">Sign Up</h2>
       <div className="signup-form">
-        <input
+      <input
           type="text"
           className="signup-input"
           placeholder="First Name"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
+        />
+        <input
+          type="text"
+          className="signup-input"
+          placeholder="Last Name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
         />
         <input
           type="text"

@@ -2,30 +2,24 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const admin = require('firebase-admin');
-const serviceAccount = require('./serviceAccountKey.json');
 const functions = require('firebase-functions');
+const serviceAccount = require('./serviceAccountKey.json');
 
 const app = express();
-
 const server = http.createServer(app);
-const io = require("socket.io")(server, {
+const io = socketIo(server, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"]
   }
 });
-
 const PORT = process.env.PORT || 5000;
+const DB_URL = 'https://collaborative-art-app-default-rtdb.firebaseio.com';
+const DEFAULT_TILE_COLOUR = 'blue';
 
-// Initialize Firebase Admin SDK with service account
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://collaborative-art-app-default-rtdb.firebaseio.com'
-});
-
-// Define a route for /some-endpoint
-app.get('/some-endpoint', (req, res) => {
-  res.json({ message: 'Hello from /some-endpoint' });
+  databaseURL: DB_URL
 });
 
 server.listen(PORT, () => {
@@ -33,20 +27,17 @@ server.listen(PORT, () => {
 });
 
 const gridSize = { rows: 10, cols: 10 };
-
 const initialGridRef = admin.database().ref('drawing');
 
 io.on('connection', (socket) => {
     console.log('A user connected');
 
-    // Fetch the initial grid state from the Firebase database
     initialGridRef.once('value', (snapshot) => {
       const initialGrid = snapshot.val() || getDefaultInitialGrid();
       console.log("get inital grid: ", initialGrid);
       socket.emit('initialGridState', initialGrid);
     });
 
-    // Listen for the 'draw' event from clients
     socket.on('updateTileColor', (data) => {
       socket.broadcast.emit('updateTileColor', data);
     });
@@ -66,7 +57,7 @@ function getDefaultInitialGrid() {
   for (let i = 0; i < gridSize.rows; i++) {
     const row = [];
     for (let j = 0; j < gridSize.cols; j++) {
-      row.push({ color: 'blue' }); // Default color is blue
+      row.push({ color: DEFAULT_TILE_COLOUR });
     }
     initialGrid.push(row);
   }

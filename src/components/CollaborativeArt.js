@@ -93,6 +93,15 @@ const [grid, setGrid] = useState(initialGrid);
         drawingRef.child(`${row}-${col}`).set({ color: 'transparent' });
         
         socket.emit('updateTileColor', { row, col, color: 'transparent' });
+
+        const metadata = JSON.parse(user.displayName);
+        metadata.isActive = true;
+
+        user.updateProfile({
+          displayName: JSON.stringify(metadata)
+        });
+        console.log(user);
+
       } else {
         console.log('No clicks left today.')
       }
