@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import firebase from './firebase'; 
-import SignUp from './components/SignUp';
-import Login from './components/Login';
-import AccountManagement from './components/AccountManagement';
-import CollaborativeArt from './components/CollaborativeArt';
-import AdminPanel from './components/AdminPanel';
-import DetailPanel from './components/DetailPanel';
-import './style/App.css';
 import { 
-  getBahaiMonth,
-  getBahaiCommunity,
-  getDonationsAmount,
-  getRemainingTiles,
-  getActiveMembers
+  SignUp, Login, AccountManagement, CollaborativeArt, AdminPanel, DetailPanel 
+} from './components';
+import { 
+  getBahaiMonth, getBahaiCommunity, getDonationsAmount,
+  getRemainingTiles, getActiveMembers
 } from './helpers.js';
+import './style/App.css';
 
 const Navbar = ({ user, userMetadata, onLogout }) => {
   const handleLogout = async () => {
