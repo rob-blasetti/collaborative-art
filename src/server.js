@@ -3,6 +3,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const admin = require('firebase-admin');
 const serviceAccount = require('./serviceAccountKey.json');
+const functions = require('firebase-functions');
 
 const app = express();
 
@@ -70,4 +71,37 @@ function getDefaultInitialGrid() {
     initialGrid.push(row);
   }
   return initialGrid;
+}
+
+exports.setCustomClaims = functions.auth.user().onCreate((user) => {
+  // Extract additional user data from the signup request
+  const { firstName, bahaiID } = user.customClaims;
+
+  // Set custom claims for the user
+  return admin.auth().setCustomUserClaims(user.uid, {
+    firstName: firstName,
+    bahaiID: bahaiID,
+    activeUser: false, // Assuming this starts as false
+  });
+});
+
+exports.getUserCustomClaims = functions.https.onCall(async (data, context) => {
+  try {
+    const uid = data.uid;
+    const user = await admin.auth().getUser(uid);
+    const customClaims = user.customClaims;
+
+    // You can now access the custom claims associated with the user
+    console.log('Custom Claims:', customClaims);
+
+    return customClaims;
+  } catch (error) {
+    console.error(error);
+    throw new functions.https.HttpsError('internal', 'Error getting user custom claims');
+  }
+});
+
+// Example function to set custom claims
+async function setCustomClaims(uid, customClaims) {
+  await admin.auth().setCustomUserClaims(uid, customClaims);
 }

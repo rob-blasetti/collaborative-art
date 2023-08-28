@@ -5,6 +5,7 @@ import SignUp from './components/SignUp';
 import Login from './components/Login';
 import AccountManagement from './components/AccountManagement';
 import CollaborativeArt from './components/CollaborativeArt';
+import AdminPanel from './components/AdminPanel';
 import DetailPanel from './components/DetailPanel';
 import './style/App.css';
 import { 
@@ -14,6 +15,23 @@ import {
   getRemainingTiles,
   getActiveMembers
 } from './helpers.js';
+
+import { 
+  getAuth,
+  getIdTokenResult 
+} from 'firebase/auth';
+
+const auth = getAuth();
+const user = auth.currentUser;
+
+if (user) {
+  getIdTokenResult(user).then((idTokenResult) => {
+    const customClaims = idTokenResult.claims;
+    console.log('Custom Claims:', customClaims);
+  }).catch((error) => {
+    console.error(error);
+  });
+}
 
 const Navbar = ({ user, onLogout }) => {
   const handleLogout = async () => {
@@ -54,6 +72,7 @@ const Navbar = ({ user, onLogout }) => {
 
 function App() {
   const [user, setUser] = useState(null);
+  const isAdmin = user && user.email === 'rblasett@gmail.com';
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged((currentUser) => {
@@ -62,6 +81,7 @@ function App() {
 
     return () => unsubscribe(); // Cleanup the listener on unmount
   }, []);
+
 
   return (
     <div className="App">
@@ -83,6 +103,7 @@ function App() {
                   activeMembers={getActiveMembers()}
                 />
                 <CollaborativeArt />
+                {/* <AdminPanel isAdmin={isAdmin} /> */}
               </>
             }
           />
