@@ -1,10 +1,9 @@
-// Import necessary Firebase Realtime Database SDK functions
-const { getDatabase, ref, get, set } = require('firebase/database');
+import { ref, get, set } from 'firebase/database';
+import firebase from './firebase'; 
 
 // Define a function to fetch grid dimensions from the database
 const fetchGridDimensions = async () => {
-  const database = getDatabase();
-  const gridDimensionsRef = ref(database, 'gridDimensions');
+  const gridDimensionsRef = ref(firebase.database(), 'gridDimensions');
   try {
     const snapshot = await get(gridDimensionsRef);
     const gridDimensions = snapshot.val();
@@ -17,8 +16,7 @@ const fetchGridDimensions = async () => {
 
 // Define a function to update grid dimensions in the database
 const updateGridDimensions = async (newRows, newCols) => {
-  const database = getDatabase();
-  const gridDimensionsRef = ref(database, 'gridDimensions');
+  const gridDimensionsRef = ref(firebase.database(), 'gridDimensions');
   const updatedGridDimensions = { rows: newRows, cols: newCols };
   try {
     await set(gridDimensionsRef, updatedGridDimensions);
@@ -29,7 +27,7 @@ const updateGridDimensions = async (newRows, newCols) => {
   }
 };
 
-module.exports = {
+export {
   fetchGridDimensions,
   updateGridDimensions
 };

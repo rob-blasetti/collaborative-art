@@ -103,7 +103,7 @@ function App() {
                   activeMembers={getActiveMembers()}
                 />
                 <CollaborativeArt />
-                {/* <AdminPanel isAdmin={isAdmin} /> */}
+                <AdminPanel isAdmin={isAdmin} />
               </>
             }
           />
