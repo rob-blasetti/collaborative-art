@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import firebase from './firebase';
 import {
-  SignUp, Login, AccountManagement, CollaborativeArt, AdminPanel, DetailPanel, About, Donate, Quote
+  SignUp, Login, AccountManagement, CollaborativeArt, AdminPanel, DetailPanel, About, Donate, Quote, Navbar
 } from './components';
 import {
   getBahaiMonth, 
@@ -12,55 +12,6 @@ import {
   getActiveMembers
 } from './helpers.js';
 import './style/App.css';
-
-const Navbar = ({ user, userMetadata, loading }) => {
-  const handleLogout = async () => {
-    try {
-      await firebase.auth().signOut();
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
-
-  return (
-    <nav className="navbar">
-      <div className="navbar__container">
-        <div className="navbar__brand">
-          <Link to="/">Collaborative.World</Link>
-        </div>
-        <Link to="/about">About</Link>
-        <Link to="/donate">Donate</Link>
-        <div className="navbar__menu">
-        {loading ? 
-          (<div className="navbar__loading">Loading...</div>) : (
-              // ... rest of your navbar content
-              user && user.email && userMetadata.firstName && userMetadata.bahaiID ? (
-                <>
-                  <div className="navbar__account">
-                    <span>{user.email}</span>
-                  </div>
-                  <div className="navbar__account">
-                    <span>{userMetadata.firstName}</span>
-                  </div>
-                  <div className="navbar__account">
-                    <span>{userMetadata.bahaiID}</span>
-                  </div>
-                  <button className="navbar__logout" onClick={handleLogout}>
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link to="/login">Login</Link>
-                  <Link to="/signup">Sign Up</Link>
-                </>
-              )
-            )}
-        </div>
-      </div>
-    </nav>
-  );
-};
 
 function App() {
   const [user, setUser] = useState(null);

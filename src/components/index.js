@@ -1,4 +1,5 @@
 export { default as AccountManagement } from './AccountManagement';
+export { default as Navbar } from './Navbar';
 export { default as AdminPanel } from './AdminPanel';
 export { default as AppRouter } from './AppRouter';
 export { default as CollaborativeArt } from './CollaborativeArt';
