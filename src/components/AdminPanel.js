@@ -11,60 +11,78 @@ const AdminPanel = ({ isAdmin }) => {
 
   const [gridDimensions, setGridDimensions] = useState(null);
 
-  const handleWipe = () => {
-    const initialTileColour = 'green';
+  const handleWipe = async () => {
+    const defaultColor = 'green';
 
-    // Ensure newRows and newCols are valid numbers
-    if (isNaN(newRows) || isNaN(newCols) || newRows <= 0 || newCols <= 0) {
-        console.error('Invalid grid dimensions provided:', { rows: newRows, cols: newCols });
-        return;  // Exit early
-    }
+    // Fetch the current grid dimensions
+    const fetchedGridDimensions = await fetchGridDimensions();
 
-    const gridSize = { rows: parseInt(newRows, 10), cols: parseInt(newCols, 10) };
-    const newGrid = Array.from({ length: gridSize.rows }, () =>
-        Array.from({ length: gridSize.cols }, () => ({ color: initialTileColour }))
+    const rows = fetchedGridDimensions.rows || 50;  // default to 50 if not valid
+    const cols = fetchedGridDimensions.cols || 50;  // default to 50 if not valid
+    
+    const newGrid = Array.from({ length: rows }, () =>
+        Array.from({ length: cols }, () => ({ color: defaultColor }))
     );
 
-    // Set new grid dimensions and update the grid
-    updateGridDimensions(newRows, newCols)
-        .then(() => {
-            const drawingRef = firebase.database().ref('drawing');
-            // Remove existing tiles
-            drawingRef.remove().then(() => {
-                // Populate the database with new tiles
-                newGrid.forEach((row, rowIndex) => {
-                    row.forEach((tile, colIndex) => {
-                        drawingRef.child(`${rowIndex}-${colIndex}`).set({ color: initialTileColour });
-                    });
-                });
+    const drawingRef = firebase.database().ref('drawing');
 
-                // Inform the clients about the grid update
-                socket.emit('wipeTiles', newGrid);
-            });
-        })
-        .catch(error => {
-            console.error('Error updating grid dimensions:', error);
+    // Construct the data to set in Firebase
+    const dataToUpdate = {};
+    newGrid.forEach((row, rowIndex) => {
+        row.forEach((tile, colIndex) => {
+            dataToUpdate[`${rowIndex}-${colIndex}`] = { color: defaultColor };
         });
+    });
+
+    // Set the entire 'drawing' reference at once
+    try {
+        await updateGridDimensions(rows, cols);
+        await drawingRef.set(dataToUpdate);
+        console.log("Database updated successfully after wipe.");
+
+        window.location.reload();
+    } catch (error) {
+        console.error("Error updating database after wipe:", error);
+    }
+
+    socket.emit('wipeTiles', newGrid);
 };
 
+const handleGridDimensionsChange = (rows, cols) => {
+  const defaultColor = 'green';
 
-  const handleGridDimensionsChange = (rows, cols) => {
-    updateGridDimensions(rows, cols)
+  // Create a new grid with tiles set to the default color
+  const newGrid = Array.from({ length: rows }, () =>
+      Array.from({ length: cols }, () => ({ color: defaultColor }))
+  );
+
+  const drawingRef = firebase.database().ref('drawing');
+
+  // Construct the data to set in Firebase
+  const dataToUpdate = {};
+  newGrid.forEach((row, rowIndex) => {
+      row.forEach((tile, colIndex) => {
+          dataToUpdate[`${rowIndex}-${colIndex}`] = { color: defaultColor };
+      });
+  });
+
+  updateGridDimensions(rows, cols)
       .then(() => {
-        // Fetch updated grid dimensions
-        fetchGridDimensions()
-          .then(updatedGridDimensions => {
-            setGridDimensions(updatedGridDimensions);
-            window.location.reload();
-          })
-          .catch(error => {
-            console.error('Error fetching updated grid dimensions:', error);
-          });
+          // Set the entire 'drawing' reference at once
+          return drawingRef.set(dataToUpdate);
+      })
+      .then(() => {
+          // Fetch updated grid dimensions
+          return fetchGridDimensions();
+      })
+      .then(updatedGridDimensions => {
+          setGridDimensions(updatedGridDimensions);
+          window.location.reload();
       })
       .catch(error => {
-        console.error('Error updating grid dimensions:', error);
+          console.error('Error updating grid dimensions or updating tiles:', error);
       });
-  };
+};
 
   useEffect(() => {
     if (gridDimensions) {
