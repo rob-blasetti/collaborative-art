@@ -3,8 +3,8 @@ import { fabric } from 'fabric';
 import io from 'socket.io-client';
 import { Tile } from '../components';
 import firebase from '../firebase';
-import { ref, onValue } from 'firebase/database';
 import mightImage from '../img/might.png';
+import { fetchGridDimensions } from '../gridDimensions';
 
 
 const CollaborativeArt = () => {
@@ -13,40 +13,57 @@ const CollaborativeArt = () => {
   
   const canvasRef = useRef(null);
   const gridSize = { rows: 50, cols:50 };
-
-  const initialGrid = Array.from({ length: gridSize.rows }, () =>
-    Array.from({ length: gridSize.cols }, () => ({
-      color: 'green',
-      image: mightImage,
-      clicked: false,
-    }))
+  const [gridDimensions, setGridDimensions] = useState({ rows: 50, cols: 50 }); // default values
+  
+  
+  const initialGrid = Array.from({ length: gridDimensions.rows }, () =>
+  Array.from({ length: gridDimensions.cols }, () => ({
+    color: 'green',
+    image: mightImage,
+    clicked: false,
+  }))
   );
-
+  
   const [grid, setGrid] = useState(initialGrid);
-
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
-    const gridDimensionsRef = ref(firebase.database(), 'gridDimensions');
-  
-    const handleGridDimensionsChange = (snapshot) => {
-      const newDimensions = snapshot.val();
-      if (newDimensions) {
-        // Reset the grid with the new dimensions and default state
-        const newGrid = Array.from({ length: newDimensions.rows }, () =>
-          Array.from({ length: newDimensions.cols }, () => ({ color: 'green', image: mightImage, clicked: false }))
+    setLoading(true);
+    
+    // Fetch grid dimensions from Firebase on component mount
+    fetchGridDimensions().then(fetchedGridDimensions => {
+      setGridDimensions(fetchedGridDimensions);
+      
+      const drawingRef = firebase.database().ref('drawing');
+      drawingRef.on('value', (snapshot) => {
+        const drawingData = snapshot.val();
+    
+        const updatedGrid = Array.from({ length: fetchedGridDimensions.rows }, () =>
+            Array.from({ length: fetchedGridDimensions.cols }, () => ({ color: 'green', image: mightImage, clicked: false }))
         );
-        setGrid(newGrid);
-      }
-    };
-  
-    // onValue returns an unsubscribe function
-    const unsubscribe = onValue(gridDimensionsRef, handleGridDimensionsChange);
-  
-    // Cleanup: call the unsubscribe function on component unmount
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+    
+        for (const key in drawingData) {
+            const [row, col] = key.split('-').map(Number);
+            const { color } = drawingData[key];
+    
+            // Check if the row and col exist in updatedGrid
+            if (updatedGrid[row] && updatedGrid[row][col]) {
+                updatedGrid[row][col].color = color;
+            } else {
+                console.warn(`No grid element found for row: ${row}, col: ${col}`);
+            }
+        }
+    
+        setGrid(updatedGrid);
+        setLoading(false);
+    });
 
+      return () => {
+          drawingRef.off();
+      };
+  });
+}, []);
+  
   useEffect(() => {
     const canvas = new fabric.Canvas(canvasRef.current);
   
@@ -135,21 +152,37 @@ const CollaborativeArt = () => {
     }
   };
 
-  const handleWipe = () => {
-    const newGrid = Array.from({ length: gridSize.rows }, () =>
-      Array.from({ length: gridSize.cols }, () => ({ color: 'blue' }))
+  const handleWipe = async () => {
+    const rows = gridDimensions.rows || 50;  // default to 50 if not valid
+    const cols = gridDimensions.cols || 50;  // default to 50 if not valid
+    const defaultColor = 'green';  // set to green as per your requirement
+    const newGrid = Array.from({ length: rows }, () =>
+      Array.from({ length: cols }, () => ({ color: defaultColor }))
     );
     setGrid(newGrid);
-
+    
     const drawingRef = firebase.database().ref('drawing');
+  
+    // Construct the data to set in Firebase
+    const dataToUpdate = {};
     newGrid.forEach((row, rowIndex) => {
       row.forEach((tile, colIndex) => {
-        drawingRef.child(`${rowIndex}-${colIndex}`).set({ color: 'blue' });
+        dataToUpdate[`${rowIndex}-${colIndex}`] = { color: defaultColor };
       });
     });
-
+  
+    // Set the entire 'drawing' reference at once
+    try {
+      await drawingRef.set(dataToUpdate);
+      console.log("Database updated successfully after wipe.");
+    } catch (error) {
+      console.error("Error updating database after wipe:", error);
+    }
+  
     socket.emit('wipeTiles', newGrid);
   };
+  
+  if (loading) { return <div>Loading...</div>; }
 
   return (
     <div>

@@ -12,27 +12,41 @@ const AdminPanel = ({ isAdmin }) => {
   const [gridDimensions, setGridDimensions] = useState(null);
 
   const handleWipe = () => {
-    const initialTileColour = 'blue';
-    const gridSize = { rows: newRows, cols: newCols };
+    const initialTileColour = 'green';
+
+    // Ensure newRows and newCols are valid numbers
+    if (isNaN(newRows) || isNaN(newCols) || newRows <= 0 || newCols <= 0) {
+        console.error('Invalid grid dimensions provided:', { rows: newRows, cols: newCols });
+        return;  // Exit early
+    }
+
+    const gridSize = { rows: parseInt(newRows, 10), cols: parseInt(newCols, 10) };
     const newGrid = Array.from({ length: gridSize.rows }, () =>
-      Array.from({ length: gridSize.cols }, () => ({ color: initialTileColour }))
+        Array.from({ length: gridSize.cols }, () => ({ color: initialTileColour }))
     );
+
     // Set new grid dimensions and update the grid
     updateGridDimensions(newRows, newCols)
-      .then(() => {        
-        const drawingRef = firebase.database().ref('drawing');
-        newGrid.forEach((row, rowIndex) => {
-          row.forEach((tile, colIndex) => {
-            drawingRef.child(`${rowIndex}-${colIndex}`).set({ color: initialTileColour });
-          });
+        .then(() => {
+            const drawingRef = firebase.database().ref('drawing');
+            // Remove existing tiles
+            drawingRef.remove().then(() => {
+                // Populate the database with new tiles
+                newGrid.forEach((row, rowIndex) => {
+                    row.forEach((tile, colIndex) => {
+                        drawingRef.child(`${rowIndex}-${colIndex}`).set({ color: initialTileColour });
+                    });
+                });
+
+                // Inform the clients about the grid update
+                socket.emit('wipeTiles', newGrid);
+            });
+        })
+        .catch(error => {
+            console.error('Error updating grid dimensions:', error);
         });
-        
-        socket.emit('wipeTiles', newGrid);
-      })
-      .catch(error => {
-        console.error('Error updating grid dimensions:', error);
-      });
-  };
+};
+
 
   const handleGridDimensionsChange = (rows, cols) => {
     updateGridDimensions(rows, cols)
@@ -41,6 +55,7 @@ const AdminPanel = ({ isAdmin }) => {
         fetchGridDimensions()
           .then(updatedGridDimensions => {
             setGridDimensions(updatedGridDimensions);
+            window.location.reload();
           })
           .catch(error => {
             console.error('Error fetching updated grid dimensions:', error);
@@ -50,6 +65,13 @@ const AdminPanel = ({ isAdmin }) => {
         console.error('Error updating grid dimensions:', error);
       });
   };
+
+  useEffect(() => {
+    if (gridDimensions) {
+        setNewRows(gridDimensions.rows.toString());
+        setNewCols(gridDimensions.cols.toString());
+    }
+  }, [gridDimensions]);
 
   useEffect(() => {
     // Fetch initial grid dimensions
