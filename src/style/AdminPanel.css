@@ -1,0 +1,66 @@
+.admin-panel {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    border: 1px solid #e1e1e1;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    margin: 20px auto;
+}
+
+.admin-panel h3 {
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.admin-panel button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.admin-panel button:hover {
+    background-color: #2980b9;
+}
+
+.admin-panel div {
+    margin-top: 20px;
+}
+
+.admin-panel label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.admin-panel input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.admin-panel p {
+    font-weight: 600;
+    color: #333;
+}
+
+.admin-panel div {
+    display: flex;
+    align-items: center; /* Vertically align items in the center */
+    gap: 1rem; /* Space between direct child elements */
+}
+
+.admin-panel label {
+    margin-right: 1rem; /* Space between labels and input fields */
+}
+
+.admin-panel button:nth-child(4) {
+    margin-right: 1rem; /* Space between the first button and the second */
+}

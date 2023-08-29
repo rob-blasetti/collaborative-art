@@ -101,46 +101,23 @@
   }
 }
 
-/* CollaborativeArt.css */
-.grid-image {
+.parent-container {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  max-height: 100%;
-  margin: 0 auto;
-}
-
-.grid-image {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  justify-content: center; /* Horizontally aligns children to the center */
+  align-items: center;     /* Vertically aligns children to the center */
+  height: 60vh;           /* Takes the full viewport height */
 }
 
 .grid-image-container {
-  margin-top: 100px; /* position the image on screen */
-  margin-left: 400px; /* position the image on screen */
   position: relative;
-  width: 500px; /* explicity set image dimensions */
-  height: 500px; /* explicity set image dimensions */
+  width: 500px;
+  height: 500px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  overflow: hidden; /* Ensure the frame content stays within the frame */
-  border: 10px solid #d6b20a; /* Golden border color */
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3); /* Shadow for a 3D effect */
+  overflow: hidden;
+  border: 10px solid #d6b20a;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
 }
 
 .row {

@@ -74,7 +74,7 @@ const CollaborativeArt = () => {
 
     socket.on('initialGridState', (initialGridData) => {
       const updatedInitialGrid = Array.from({ length: gridSize.rows }, () =>
-        Array.from({ length: gridSize.cols }, () => ({ color: 'blue' }))
+        Array.from({ length: gridSize.cols }, () => ({ color: 'green' }))
       );
 
       for (const key in initialGridData) {
@@ -151,58 +151,29 @@ const CollaborativeArt = () => {
       console.log('User not authenticated. Please log in to click tiles.');
     }
   };
-
-  const handleWipe = async () => {
-    const rows = gridDimensions.rows || 50;  // default to 50 if not valid
-    const cols = gridDimensions.cols || 50;  // default to 50 if not valid
-    const defaultColor = 'green';  // set to green as per your requirement
-    const newGrid = Array.from({ length: rows }, () =>
-      Array.from({ length: cols }, () => ({ color: defaultColor }))
-    );
-    setGrid(newGrid);
-    
-    const drawingRef = firebase.database().ref('drawing');
-  
-    // Construct the data to set in Firebase
-    const dataToUpdate = {};
-    newGrid.forEach((row, rowIndex) => {
-      row.forEach((tile, colIndex) => {
-        dataToUpdate[`${rowIndex}-${colIndex}`] = { color: defaultColor };
-      });
-    });
-  
-    // Set the entire 'drawing' reference at once
-    try {
-      await drawingRef.set(dataToUpdate);
-      console.log("Database updated successfully after wipe.");
-    } catch (error) {
-      console.error("Error updating database after wipe:", error);
-    }
-  
-    socket.emit('wipeTiles', newGrid);
-  };
   
   if (loading) { return <div>Loading...</div>; }
 
   return (
     <div>
       <h2>Collaborative Art</h2>
-      <button onClick={handleWipe}>Wipe</button>
-      <div className="grid-image-container" style={{ backgroundImage: `url(${mightImage})` }}>
-        <div className="grid-image">
-          {grid.map((row, rowIndex) => (
-            <div key={rowIndex} className="row" style={{ '--cols': grid[0].length, '--rows': grid.length }}>
-              {row.map((tile, colIndex) => (
-                <Tile
-                  key={colIndex}
-                  color={tile.color}
-                  image={mightImage}
-                  clicked={tile.clicked}
-                  onClick={() => handleTileClick(rowIndex, colIndex)}
-                />
-              ))}
-            </div>
-          ))}
+      <div class="parent-container">
+        <div className="grid-image-container" style={{ backgroundImage: `url(${mightImage})` }}>
+          <div className="grid-image">
+            {grid.map((row, rowIndex) => (
+              <div key={rowIndex} className="row" style={{ '--cols': grid[0].length, '--rows': grid.length }}>
+                {row.map((tile, colIndex) => (
+                  <Tile
+                    key={colIndex}
+                    color={tile.color}
+                    image={mightImage}
+                    clicked={tile.clicked}
+                    onClick={() => handleTileClick(rowIndex, colIndex)}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

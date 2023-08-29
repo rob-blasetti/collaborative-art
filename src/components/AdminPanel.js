@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchGridDimensions, updateGridDimensions } from '../gridDimensions';
 import firebase from '../firebase';
 import io from 'socket.io-client';
+import '../style/AdminPanel.css';
 
 const AdminPanel = ({ isAdmin }) => {
   const serverAddress = 'http://localhost:5000';
@@ -104,34 +105,36 @@ const handleGridDimensionsChange = (rows, cols) => {
 
   if (isAdmin) {
     return (
-      <div className="admin-panel">
+        <div className="admin-panel">
         <h3>Admin Panel</h3>
-        <button onClick={handleWipe}>Wipe</button>
-        <div>
-          <label>
-            New Rows:
-            <input
-              type="number"
-              value={newRows}
-              onChange={e => setNewRows(e.target.value)}
-            />
-          </label>
-          <label>
-            New Columns:
-            <input
-              type="number"
-              value={newCols}
-              onChange={e => setNewCols(e.target.value)}
-            />
-          </label>
-          <button onClick={() => handleGridDimensionsChange(newRows, newCols)}>Update Grid Dimensions</button>
+        <div className="input-container">
+            <label>
+                New Rows:
+                <input
+                    type="number"
+                    value={newRows}
+                    onChange={e => setNewRows(e.target.value)}
+                />
+            </label>
+            <label>
+                New Columns:
+                <input
+                    type="number"
+                    value={newCols}
+                    onChange={e => setNewCols(e.target.value)}
+                />
+            </label>
+        </div>
+        <div className="buttons-container">
+            <button onClick={() => handleGridDimensionsChange(newRows, newCols)}>Update Grid Dimensions</button>
+            <button onClick={handleWipe}>Wipe</button>
         </div>
         <div>
-          {gridDimensions && (
-            <p>
-              Current Grid Dimensions: {gridDimensions.rows} rows x {gridDimensions.cols} columns
-            </p>
-          )}
+            {gridDimensions && (
+                <p>
+                    Current Grid Dimensions: {gridDimensions.rows} rows x {gridDimensions.cols} columns
+                </p>
+            )}
         </div>
       </div>
     );
