@@ -24,10 +24,15 @@ const getDonationsAmount = () => {
   return '$1000';
 };
 
-const getRemainingTiles = () => {
-  // Implement the logic to get the remaining tiles
-  // Example:
-  return 50;
+const getRemainingTiles = async () => {
+  try {
+    const response = await fetch('http://localhost:5000/getRemainingTiles');
+    const data = await response.json();
+    return data.count;
+  } catch (error) {
+    console.error('Failed to fetch remaining tiles:', error);
+    return 0;  // Or some default value
+  }
 };
 
 const getActiveMembers = async () => {

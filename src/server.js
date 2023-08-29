@@ -25,6 +25,7 @@ admin.initializeApp({
   databaseURL: DB_URL
 });
 
+const db = admin.database();
 const auth = admin.auth();
 
 server.listen(PORT, () => {
@@ -40,6 +41,15 @@ app.get('/activeUsersCount', async (req, res) => {
     res.json({ count });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch active users count' });
+  }
+});
+
+app.get('/getRemainingTiles', async (req, res) => {
+  try {
+    const count = await getRemainingTiles();
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get remaining tiles' });
   }
 });
 
@@ -107,4 +117,31 @@ async function countActiveUsers() {
   }
 }
 
-module.exports = { countActiveUsers };
+async function getRemainingTiles() {
+  try {
+    // Connect to the database and get tiles reference
+    const drawingRef = db.ref('drawing');
+
+    // Fetch the tiles from the database
+    const snapshot = await drawingRef.once('value');
+    const tilesData = snapshot.val();
+
+    // Count the green tiles
+    let greenTileCount = 0;
+    for (const key in tilesData) {
+      if (tilesData[key].color === 'green') {
+        greenTileCount++;
+      }
+    }
+
+    return greenTileCount;
+  } catch (error) {
+    console.error('Error returning remaining tiles:', error);
+    throw error;
+  }
+}
+
+module.exports = { 
+  countActiveUsers, 
+  getRemainingTiles 
+};
