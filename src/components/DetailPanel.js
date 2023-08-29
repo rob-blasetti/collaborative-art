@@ -1,7 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getActiveMembers } from '../helpers';  // import the helper function
 import '../style/Panel.css';
 
-const DetailPanel = ({ month, communityName, donations, remainingTiles, activeMembers }) => {
+const DetailPanel = ({ month, communityName, donations, remainingTiles }) => {
+  const [activeMembers, setActiveMembers] = useState(null);
+
+  useEffect(() => {
+    // Fetch the active member count when the component mounts
+    const fetchActiveMembers = async () => {
+      try {
+        const count = await getActiveMembers();
+        setActiveMembers(count);
+      } catch (error) {
+        console.error('Error fetching active user count:', error);
+      }
+    };
+  
+    fetchActiveMembers();
+  }, []);  
+
   return (
     <div className="panel">
       <div className="panel-item">
@@ -22,7 +39,7 @@ const DetailPanel = ({ month, communityName, donations, remainingTiles, activeMe
       </div>
       <div className="panel-item">
         <h3 className="panel-item-title">Active Members</h3>
-        <p className="panel-item-content">{activeMembers}</p>
+        <p className="panel-item-content">{activeMembers !== null ? activeMembers : 'Loading...'}</p>
       </div>
     </div>
   );

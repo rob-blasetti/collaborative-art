@@ -30,10 +30,15 @@ const getRemainingTiles = () => {
   return 50;
 };
 
-const getActiveMembers = () => {
-  // Implement the logic to get the active members count
-  // Example:
-  return 200;
+const getActiveMembers = async () => {
+  try {
+    const response = await fetch('http://localhost:5000/activeUsersCount');
+    const data = await response.json();
+    return data.count;
+  } catch (error) {
+    console.error('Failed to fetch active users count:', error);
+    return 0;  // Or some default value
+  }
 };
 
 export {

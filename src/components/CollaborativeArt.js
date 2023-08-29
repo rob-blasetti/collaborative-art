@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { fabric } from 'fabric';
 import io from 'socket.io-client';
-import Tile from './Tile';
+import { Tile } from '../components';
 import firebase from '../firebase';
 import mightImage from '../img/might.png';
 

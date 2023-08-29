@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const admin = require('firebase-admin');
 const functions = require('firebase-functions');
 const serviceAccount = require('./serviceAccountKey.json');
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
@@ -13,6 +14,8 @@ const io = socketIo(server, {
     methods: ["GET", "POST"]
   }
 });
+app.use(cors({ origin: 'http://localhost:3000' }));
+
 const PORT = process.env.PORT || 5000;
 const DB_URL = 'https://collaborative-art-app-default-rtdb.firebaseio.com';
 const DEFAULT_TILE_COLOUR = 'blue';
@@ -22,6 +25,8 @@ admin.initializeApp({
   databaseURL: DB_URL
 });
 
+const auth = admin.auth();
+
 server.listen(PORT, () => {
   console.log(`Socket.io server is running on port ${PORT}`);
 });
@@ -29,12 +34,20 @@ server.listen(PORT, () => {
 const gridSize = { rows: 10, cols: 10 };
 const initialGridRef = admin.database().ref('drawing');
 
+app.get('/activeUsersCount', async (req, res) => {
+  try {
+    const count = await countActiveUsers();
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch active users count' });
+  }
+});
+
 io.on('connection', (socket) => {
     console.log('A user connected');
 
     initialGridRef.once('value', (snapshot) => {
       const initialGrid = snapshot.val() || getDefaultInitialGrid();
-      console.log("get inital grid: ", initialGrid);
       socket.emit('initialGridState', initialGrid);
     });
 
@@ -64,35 +77,34 @@ function getDefaultInitialGrid() {
   return initialGrid;
 }
 
-exports.setCustomClaims = functions.auth.user().onCreate((user) => {
-  // Extract additional user data from the signup request
-  const { firstName, bahaiID } = user.customClaims;
-
-  // Set custom claims for the user
-  return admin.auth().setCustomUserClaims(user.uid, {
-    firstName: firstName,
-    bahaiID: bahaiID,
-    activeUser: false, // Assuming this starts as false
-  });
-});
-
-exports.getUserCustomClaims = functions.https.onCall(async (data, context) => {
+async function countActiveUsers() {
   try {
-    const uid = data.uid;
-    const user = await admin.auth().getUser(uid);
-    const customClaims = user.customClaims;
+      // Get a list of all users.
+      const users = await auth.listUsers();
 
-    // You can now access the custom claims associated with the user
-    console.log('Custom Claims:', customClaims);
+      // Initialize a counter to track the number of users that are active.
+      let activeUserCount = 0;
 
-    return customClaims;
+      // Iterate through the list of users.
+      users.users.forEach(user => {
+          // Parse the displayName to get user metadata
+          const userData = JSON.parse(user.displayName || '{}');
+          
+          // Get the value of the `isActive` property.
+          const isActive = userData.isActive;
+
+          // If the user is active, increment the counter.
+          if (isActive) {
+              activeUserCount++;
+          }
+      });
+
+      // Print the number of active users.
+      console.log(activeUserCount);
+      return activeUserCount;
   } catch (error) {
-    console.error(error);
-    throw new functions.https.HttpsError('internal', 'Error getting user custom claims');
+      console.error('Error counting active users:', error);
   }
-});
-
-// Example function to set custom claims
-async function setCustomClaims(uid, customClaims) {
-  await admin.auth().setCustomUserClaims(uid, customClaims);
 }
+
+module.exports = { countActiveUsers };

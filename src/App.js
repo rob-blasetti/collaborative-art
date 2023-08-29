@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import firebase from './firebase'; 
-import { 
-  SignUp, Login, AccountManagement, CollaborativeArt, AdminPanel, DetailPanel 
+import firebase from './firebase';
+import {
+  SignUp, Login, AccountManagement, CollaborativeArt, AdminPanel, DetailPanel
 } from './components';
-import { 
-  getBahaiMonth, getBahaiCommunity, getDonationsAmount,
-  getRemainingTiles, getActiveMembers
+import {
+  getBahaiMonth, 
+  getBahaiCommunity, 
+  getDonationsAmount,
+  getRemainingTiles, 
+  getActiveMembers
 } from './helpers.js';
 import './style/App.css';
 
-const Navbar = ({ user, userMetadata, onLogout }) => {
+const Navbar = ({ user, userMetadata, loading }) => {
   const handleLogout = async () => {
     try {
       await firebase.auth().signOut();
@@ -26,27 +29,31 @@ const Navbar = ({ user, userMetadata, onLogout }) => {
           <Link to="/">Collaborative.World</Link>
         </div>
         <div className="navbar__menu">
-          {user ? (
-            <>
-              <div className="navbar__account">
-                <span>{user.email}</span>
-              </div>
-              <div className="navbar__account">
-                <span>{userMetadata.firstName}</span>
-              </div>
-              <div className="navbar__account">
-                <span>{userMetadata.bahaiID}</span>
-              </div>
-              <button className="navbar__logout" onClick={handleLogout}>
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login">Login</Link>
-              <Link to="/signup">Sign Up</Link>
-            </>
-          )}
+        {loading ? 
+          (<div className="navbar__loading">Loading...</div>) : (
+              // ... rest of your navbar content
+              user && user.email && userMetadata.firstName && userMetadata.bahaiID ? (
+                <>
+                  <div className="navbar__account">
+                    <span>{user.email}</span>
+                  </div>
+                  <div className="navbar__account">
+                    <span>{userMetadata.firstName}</span>
+                  </div>
+                  <div className="navbar__account">
+                    <span>{userMetadata.bahaiID}</span>
+                  </div>
+                  <button className="navbar__logout" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login">Login</Link>
+                  <Link to="/signup">Sign Up</Link>
+                </>
+              )
+            )}
         </div>
       </div>
     </nav>
@@ -57,6 +64,7 @@ function App() {
   const [user, setUser] = useState(null);
   const isAdmin = user && user.email === 'rblasett@gmail.com';
   const [userMetadata, setUserMetadata] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged((currentUser) => {
@@ -66,8 +74,10 @@ function App() {
         const parsedData = JSON.parse(currentUser.displayName);
         console.log(parsedData)
         setUserMetadata(parsedData);
+        setLoading(false);
       } else {
         console.log("No user is signed in.");
+        setLoading(false);
       }
     });
 
@@ -77,7 +87,7 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <Navbar user={user} userMetadata={userMetadata} />
+        <Navbar user={user} userMetadata={userMetadata} loading={loading} />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />

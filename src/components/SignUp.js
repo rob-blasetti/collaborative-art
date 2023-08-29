@@ -9,9 +9,13 @@ const SignUp = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [bahaiId, setBahaiId] = useState('');
-  const [isActive, setIsActive] = useState(false);
+  const [isActive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [setUser] = useState(null);
+  const [setUserMetadata] = useState({});
 
-  const handleSignUp = async () => {
+  const handleSignUp = async () => {  
+    setLoading(true); // Start loading
     const auth = getAuth();
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -29,8 +33,13 @@ const SignUp = () => {
         displayName: JSON.stringify(userData),
       });
 
+      setUser(user);
+      setUserMetadata(userData);
+      setLoading(false);
+
       console.log('User signed up successfully!', user);
     } catch (error) {
+      setLoading(false); // End loading
       console.error('Error signing up:', error);
     }
   };
@@ -38,6 +47,9 @@ const SignUp = () => {
   return (
     <div className="signup-container">
       <h2 className="signup-title">Sign Up</h2>
+      {loading ? (
+      <div className="loading">Signing up...</div>  // Loading message
+      ) : (
       <div className="signup-form">
       <input
           type="text"
@@ -76,6 +88,7 @@ const SignUp = () => {
         />
         <button className="signup-button" onClick={handleSignUp}>Sign Up</button>
       </div>
+      )}
     </div>
   );
 };

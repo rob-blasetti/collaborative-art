@@ -48,4 +48,30 @@
     font-size: 12px;
     margin-top: 5px;
   }
-  
+
+  /* Loading styles */
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px; /* You can adjust this based on your design */
+    font-size: 1.2em;
+    color: #333; /* Dark text color */
+    background-color: #f7f7f7; /* Light gray background */
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    margin: 20px 0; /* Spacing */
+  }
+
+  /* Optional: Add an animation for the loading dots */
+  @keyframes loadingDots {
+    0% { content: "."; }
+    33% { content: ".."; }
+    66% { content: "..."; }
+    100% { content: ""; }
+  }
+
+  .loading::after {
+    content: "...";
+    animation: loadingDots 1s infinite;
+}

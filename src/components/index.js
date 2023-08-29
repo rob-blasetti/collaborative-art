@@ -2,7 +2,6 @@ export { default as AccountManagement } from './AccountManagement';
 export { default as AdminPanel } from './AdminPanel';
 export { default as AppRouter } from './AppRouter';
 export { default as CollaborativeArt } from './CollaborativeArt';
-export { default as Crypto } from './Crypto';
 export { default as DetailPanel } from './DetailPanel';
 export { default as Home } from './Home';
 export { default as Login } from './Login';
