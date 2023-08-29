@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom'; // Import useHistory
 
 import '../style/SignUp.css';
 
@@ -11,8 +12,10 @@ const SignUp = () => {
   const [bahaiId, setBahaiId] = useState('');
   const [isActive] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [setUser] = useState(null);
-  const [setUserMetadata] = useState({});
+  const [user, setUser] = useState(null);
+  const [userMetadata, setUserMetadata] = useState({});
+
+  let navigate = useNavigate();
 
   const handleSignUp = async () => {  
     setLoading(true); // Start loading
@@ -38,6 +41,7 @@ const SignUp = () => {
       setLoading(false);
 
       console.log('User signed up successfully!', user);
+      navigate('/');
     } catch (error) {
       setLoading(false); // End loading
       console.error('Error signing up:', error);

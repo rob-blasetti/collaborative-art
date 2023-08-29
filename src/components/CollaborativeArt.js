@@ -157,7 +157,7 @@ const CollaborativeArt = () => {
   return (
     <div>
       <h2>Collaborative Art</h2>
-      <div class="parent-container">
+      <div className="parent-container">
         <div className="grid-image-container" style={{ backgroundImage: `url(${mightImage})` }}>
           <div className="grid-image">
             {grid.map((row, rowIndex) => (

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import firebase from './firebase';
 import {
-  SignUp, Login, AccountManagement, CollaborativeArt, AdminPanel, DetailPanel
+  SignUp, Login, AccountManagement, CollaborativeArt, AdminPanel, DetailPanel, About, Donate
 } from './components';
 import {
   getBahaiMonth, 
@@ -28,6 +28,8 @@ const Navbar = ({ user, userMetadata, loading }) => {
         <div className="navbar__brand">
           <Link to="/">Collaborative.World</Link>
         </div>
+        <Link to="/about">About</Link>
+        <Link to="/donate">Donate</Link>
         <div className="navbar__menu">
         {loading ? 
           (<div className="navbar__loading">Loading...</div>) : (
@@ -91,6 +93,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/donate" element={<Donate />} />
           <Route path="/account" element={<AccountManagement />} />
           <Route
             path="/"

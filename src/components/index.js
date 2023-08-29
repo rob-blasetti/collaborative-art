@@ -6,4 +6,6 @@ export { default as DetailPanel } from './DetailPanel';
 export { default as Home } from './Home';
 export { default as Login } from './Login';
 export { default as SignUp } from './SignUp';
+export { default as About } from './About';
+export { default as Donate } from './Donate';
 export { default as Tile } from './Tile';
