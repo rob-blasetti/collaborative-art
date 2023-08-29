@@ -3,6 +3,7 @@ import { fabric } from 'fabric';
 import io from 'socket.io-client';
 import { Tile } from '../components';
 import firebase from '../firebase';
+import { ref, onValue } from 'firebase/database';
 import mightImage from '../img/might.png';
 
 
@@ -14,17 +15,41 @@ const CollaborativeArt = () => {
   const gridSize = { rows: 50, cols:50 };
 
   const initialGrid = Array.from({ length: gridSize.rows }, () =>
-  Array.from({ length: gridSize.cols }, () => ({
-    color: 'green',
-    image: mightImage,
-    clicked: false,
-  }))
-);
+    Array.from({ length: gridSize.cols }, () => ({
+      color: 'green',
+      image: mightImage,
+      clicked: false,
+    }))
+  );
 
-const [grid, setGrid] = useState(initialGrid);
+  const [grid, setGrid] = useState(initialGrid);
+
+  useEffect(() => {
+    const gridDimensionsRef = ref(firebase.database(), 'gridDimensions');
+  
+    const handleGridDimensionsChange = (snapshot) => {
+      const newDimensions = snapshot.val();
+      if (newDimensions) {
+        // Reset the grid with the new dimensions and default state
+        const newGrid = Array.from({ length: newDimensions.rows }, () =>
+          Array.from({ length: newDimensions.cols }, () => ({ color: 'green', image: mightImage, clicked: false }))
+        );
+        setGrid(newGrid);
+      }
+    };
+  
+    // onValue returns an unsubscribe function
+    const unsubscribe = onValue(gridDimensionsRef, handleGridDimensionsChange);
+  
+    // Cleanup: call the unsubscribe function on component unmount
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = new fabric.Canvas(canvasRef.current);
+  
 
     socket.on('wipeTiles', () => {
       socket.emit('fetchInitialGrid');
@@ -133,7 +158,7 @@ const [grid, setGrid] = useState(initialGrid);
       <div className="grid-image-container" style={{ backgroundImage: `url(${mightImage})` }}>
         <div className="grid-image">
           {grid.map((row, rowIndex) => (
-            <div key={rowIndex} className="row" style={{ '--cols': gridSize.cols, '--rows': gridSize.rows }}>
+            <div key={rowIndex} className="row" style={{ '--cols': grid[0].length, '--rows': grid.length }}>
               {row.map((tile, colIndex) => (
                 <Tile
                   key={colIndex}
