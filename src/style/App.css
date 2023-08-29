@@ -149,6 +149,13 @@
 
 .tile.clicked {
   background-color: transparent;
+  box-shadow: none;
+  transform: none;
+} 
+
+.tile.clicked:hover {
+  box-shadow: none;
+  transform: none;
 } 
 
 .quote-container {

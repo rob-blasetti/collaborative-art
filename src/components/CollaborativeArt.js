@@ -12,28 +12,26 @@ const CollaborativeArt = () => {
   const [prevClickDate, setPrevClickDate] = useState(null);
   
   const canvasRef = useRef(null);
-  const gridSize = { rows: 50, cols:50 };
-  const [gridDimensions, setGridDimensions] = useState({ rows: 50, cols: 50 }); // default values
-  
-  
-  const initialGrid = Array.from({ length: gridDimensions.rows }, () =>
-  Array.from({ length: gridDimensions.cols }, () => ({
-    color: 'green',
-    image: mightImage,
-    clicked: false,
-  }))
-  );
-  
-  const [grid, setGrid] = useState(initialGrid);
+  const [gridDimensions, setGridDimensions] = useState(null); // set to null initially
+  const [grid, setGrid] = useState(null);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     setLoading(true);
     
-    // Fetch grid dimensions from Firebase on component mount
     fetchGridDimensions().then(fetchedGridDimensions => {
       setGridDimensions(fetchedGridDimensions);
-      
+
+      const initialGrid = Array.from({ length: fetchedGridDimensions.rows }, () =>
+        Array.from({ length: fetchedGridDimensions.cols }, () => ({
+          color: 'green',
+          image: mightImage,
+          clicked: false,
+        }))
+      );
+
+      setGrid(initialGrid);
+
       const drawingRef = firebase.database().ref('drawing');
       drawingRef.on('value', (snapshot) => {
         const drawingData = snapshot.val();
@@ -44,11 +42,11 @@ const CollaborativeArt = () => {
     
         for (const key in drawingData) {
             const [row, col] = key.split('-').map(Number);
-            const { color } = drawingData[key];
-    
-            // Check if the row and col exist in updatedGrid
+            const tileData = drawingData[key];
+
             if (updatedGrid[row] && updatedGrid[row][col]) {
-                updatedGrid[row][col].color = color;
+              updatedGrid[row][col].color = tileData.color;
+              updatedGrid[row][col].clicked = tileData.clicked;
             } else {
                 console.warn(`No grid element found for row: ${row}, col: ${col}`);
             }
@@ -73,17 +71,19 @@ const CollaborativeArt = () => {
     });
 
     socket.on('initialGridState', (initialGridData) => {
-      const updatedInitialGrid = Array.from({ length: gridSize.rows }, () =>
-        Array.from({ length: gridSize.cols }, () => ({ color: 'green' }))
+      if (!gridDimensions) return;  // Skip processing if gridDimensions is null
+    
+      const updatedInitialGrid = Array.from({ length: gridDimensions.rows }, () =>
+        Array.from({ length: gridDimensions.cols }, () => ({ color: 'green' }))
       );
-
+    
       for (const key in initialGridData) {
         const [row, col] = key.split('-').map(Number);
         const { color } = initialGridData[key];
         
         updatedInitialGrid[row][col] = { color };
       }
-
+    
       setGrid(updatedInitialGrid);
     });
 
@@ -130,9 +130,12 @@ const CollaborativeArt = () => {
         newGrid[row][col].color = 'transparent';
         newGrid[row][col].clicked = true;
         setGrid(newGrid);
-        
+
         const drawingRef = firebase.database().ref('drawing');
-        drawingRef.child(`${row}-${col}`).set({ color: 'transparent' });
+        drawingRef.child(`${row}-${col}`).set({ 
+          color: 'transparent', 
+          clicked: true  // saving clicked state to the database
+        });
         
         socket.emit('updateTileColor', { row, col, color: 'transparent' });
 
@@ -152,7 +155,9 @@ const CollaborativeArt = () => {
     }
   };
   
-  if (loading) { return <div>Loading...</div>; }
+  if (loading || !grid || !gridDimensions) { 
+    return <div>Loading...</div>; 
+  }
 
   return (
     <div>
@@ -168,6 +173,7 @@ const CollaborativeArt = () => {
                     color={tile.color}
                     image={mightImage}
                     clicked={tile.clicked}
+                    className={tile.clicked ? 'tile clicked' : 'tile'}  // Conditionally apply the clicked class here
                     onClick={() => handleTileClick(rowIndex, colIndex)}
                   />
                 ))}
