@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import firebase from './firebase';
 import {
-  SignUp, Login, AccountManagement, CollaborativeArt, AdminPanel, DetailPanel, About, Donate
+  SignUp, Login, AccountManagement, CollaborativeArt, AdminPanel, DetailPanel, About, Donate, Quote
 } from './components';
 import {
   getBahaiMonth, 
@@ -108,6 +108,7 @@ function App() {
                   activeMembers={getActiveMembers()}
                 />
                 <CollaborativeArt />
+                <Quote />
                 <AdminPanel isAdmin={isAdmin} />
               </>
             }

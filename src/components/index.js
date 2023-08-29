@@ -9,3 +9,4 @@ export { default as SignUp } from './SignUp';
 export { default as About } from './About';
 export { default as Donate } from './Donate';
 export { default as Tile } from './Tile';
+export { default as Quote } from './Quote';
