@@ -15,19 +15,15 @@ const Navbar = ({ user, userMetadata, loading }) => {
         <nav className="navbar">
             <div className="navbar__container">
             <div className="navbar__brand">
-                <Link to="/">Collaborative.World</Link>
+                <Link to="/">Sacred Canvas</Link>
             </div>
             <Link to="/about">About</Link>
             <Link to="/donate">Donate</Link>
             <div className="navbar__menu">
             {loading ? 
                 (<div className="navbar__loading">Loading...</div>) : (
-                    // ... rest of your navbar content
                     user && user.email && userMetadata.firstName && userMetadata.bahaiID ? (
                     <>
-                        <div className="navbar__account">
-                        <span>{user.email}</span>
-                        </div>
                         <div className="navbar__account">
                         <span>{userMetadata.firstName}</span>
                         </div>

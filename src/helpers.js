@@ -1,4 +1,5 @@
 import { monthsData } from './monthsData.js';
+import Web3 from 'web3';
 
 const getBahaiMonth = () => {
   const todaysDate = new Date().toLocaleString('en-US', {
@@ -46,10 +47,23 @@ const getActiveMembers = async () => {
   }
 };
 
+
+let web3;
+
+if (window.ethereum) {
+    web3 = new Web3(window.ethereum);
+    window.ethereum.enable();
+} else if (window.web3) {
+    web3 = new Web3(window.web3.currentProvider);
+} else {
+    console.log('MetaMask not detected');
+}
+
 export {
   getBahaiMonth,
   getBahaiCommunity,
   getDonationsAmount,
   getRemainingTiles,
-  getActiveMembers
+  getActiveMembers,
+  web3
 };
