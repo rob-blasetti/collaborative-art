@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import firebase from './firebase';
 import {
-  SignUp, Login, AccountManagement, CollaborativeArt, AdminPanel, DetailPanel, About, Donate, Quote, Navbar
+  SignUp, Login, AccountManagement, CollaborativeArt, AdminPanel, DetailPanel, About, Donate, Quote, Navbar, CommunityPage
 } from './components';
 import {
   getBahaiMonth, 
@@ -82,6 +82,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/about" element={<About />} />
           <Route path="/donate" element={<Donate />} />
+          <Route path="/community" element={<CommunityPage communityId={'Banyule'}/>} />
           <Route path="/account" element={<AccountManagement />} />
           <Route
             path="/"

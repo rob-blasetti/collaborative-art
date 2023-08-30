@@ -18,6 +18,7 @@ const Navbar = ({ user, userMetadata, loading }) => {
                 <Link to="/">Sacred Canvas</Link>
             </div>
             <Link to="/about">About</Link>
+            <Link to="/community">Community</Link>
             <Link to="/donate">Donate</Link>
             <div className="navbar__menu">
             {loading ? 

@@ -21,6 +21,17 @@ const getBahaiCommunity = () => {
   return 'Banyule';
 };
 
+const getCommunityDetails = (communityId) => {
+  return {
+    communityId,
+    activeMembers: 50, // Replace with actual count of active members
+    totalMembers: 100, // Replace with actual count of total members
+    treasuryAddress: '0x1234567890abcdef', // Replace with actual treasury address
+    donatedFunds: 10.5, // Replace with actual donated funds amount
+    revokedFunds: 2.3, // Replace with actual revoked funds amount
+  };
+};
+
 const getDonationsAmount = async () => {
   try {
     const balance = await web3.eth.getBalance(contractAddress);
@@ -71,5 +82,6 @@ export {
   getDonationsAmount,
   getRemainingTiles,
   getActiveMembers,
+  getCommunityDetails,
   web3
 };
