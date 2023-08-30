@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getActiveMembers, getRemainingTiles } from '../helpers';  // import the helper function
+import { getActiveMembers, getRemainingTiles, getDonationsAmount } from '../helpers';  // import the helper function
 import '../style/Panel.css';
 
 const DetailPanel = ({ month, communityName, donations }) => {
   const [activeMembers, setActiveMembers] = useState(null);
   const [remainingTiles, setRemainingTiles] = useState(null);
+  const [donationsBalance, setDonationsBalance] = React.useState('Loading...');
 
   useEffect(() => {
     // Fetch the active member count when the component mounts
@@ -30,8 +31,13 @@ const DetailPanel = ({ month, communityName, donations }) => {
         console.error('Error fetching remaining tiles:', error);
       }
     };
-  
+    async function fetchDonationsAmount() {
+      const balance = await getDonationsAmount();
+      setDonationsBalance(balance);
+    }
+
     fetchRemainingTiles();
+    fetchDonationsAmount();
   }, []);  
 
   return (
@@ -46,7 +52,7 @@ const DetailPanel = ({ month, communityName, donations }) => {
       </div>
       <div className="panel-item">
         <h3 className="panel-item-title">Donations</h3>
-        <p className="panel-item-content">{donations}</p>
+        <p className="panel-item-content">{donationsBalance} ETH</p>
       </div>
       <div className="panel-item">
         <h3 className="panel-item-title">Remaining Tiles</h3>
